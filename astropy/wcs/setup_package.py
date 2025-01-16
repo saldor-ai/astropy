@@ -10,7 +10,6 @@ from os.path import join
 
 import numpy
 from setuptools import Extension
-from setuptools.dep_util import newer_group
 
 from extension_helpers import get_compiler, import_file, pkg_config, write_if_different
 

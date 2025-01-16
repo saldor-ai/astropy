@@ -2059,10 +2059,17 @@ NAXIS2  =                 2078 / length of second array dimension
     assert np.all(test_wcs.footprint_contains(coords) == np.array([True, False]))
 
 
-def test_none_differential_type():
-    """
-    This is a regression test for #8021
-    """
+def test_subclass_property_error():
+    """Test that error messages for missing attributes in subclass properties are correct."""
+    class CustomCoord(SkyCoord):
+        @property
+        def prop(self):
+            return self.random_attr  # Attribute that doesn't exist
+
+    c = CustomCoord('00h42m30s', '+41d12m00s', frame='icrs')
+    with pytest.raises(AttributeError, match="'CustomCoord' object has no attribute 'random_attr'"):
+        c.prop
+
     from astropy.coordinates import BaseCoordinateFrame
 
     class MockHeliographicStonyhurst(BaseCoordinateFrame):

@@ -894,7 +894,16 @@ class SkyCoord(ShapedLikeNDArray):
             if frame_cls is not None and self.frame.is_transformable_to(frame_cls):
                 return self.transform_to(attr)
 
-        # Fail
+        # Handle case where a property exists but raises AttributeError
+        # Look for property in the class
+        if isinstance(getattr(self.__class__, attr, None), property):
+            try:
+                return getattr(self.__class__, attr).__get__(self)
+            except AttributeError as e:
+                # Re-raise the original AttributeError from the property
+                raise e from None
+
+        # Fail - attribute truly doesn't exist
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{attr}'"
         )
