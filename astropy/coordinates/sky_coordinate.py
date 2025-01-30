@@ -875,6 +875,13 @@ class SkyCoord(ShapedLikeNDArray):
             if self._is_name(attr):
                 return self  # Should this be a deepcopy of self?
 
+            # First check if the attribute exists in the class's __dict__ 
+            # to properly support properties that may raise AttributeError
+            if attr in type(self).__dict__:
+                # Let the normal attribute lookup happen which will correctly
+                # propagate any AttributeError from property access
+                return object.__getattribute__(self, attr)
+
             # Anything in the set of all possible frame_attr_names is handled
             # here. If the attr is relevant for the current frame then delegate
             # to self.frame otherwise get it from self._<attr>.
