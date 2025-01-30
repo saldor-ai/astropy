@@ -10,9 +10,22 @@ from os.path import join
 
 import numpy
 from setuptools import Extension
-from setuptools.dep_util import newer_group
 
 from extension_helpers import get_compiler, import_file, pkg_config, write_if_different
+
+def newer_group(sources, target, missing='error'):
+    """Check if a target is up-to-date based on a group of source files.
+    
+    A simplified version of setuptools.dep_util.newer_group that is compatible
+    with newer setuptools versions.
+    """
+    if not os.path.exists(target):
+        return True
+    target_mtime = os.path.getmtime(target)
+    for source in sources:
+        if os.path.getmtime(source) > target_mtime:
+            return True
+    return False
 
 WCSROOT = os.path.relpath(os.path.dirname(__file__))
 WCSVERSION = "7.12"
