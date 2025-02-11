@@ -871,6 +871,11 @@ class SkyCoord(ShapedLikeNDArray):
         Overrides getattr to return coordinates that this can be transformed
         to, based on the alias attr in the primary transform graph.
         """
+        # First check if this is a property defined in the class
+        for cls in type(self).__mro__:
+            if attr in cls.__dict__ and isinstance(cls.__dict__[attr], property):
+                return cls.__dict__[attr].__get__(self, type(self))
+
         if "_sky_coord_frame" in self.__dict__:
             if self._is_name(attr):
                 return self  # Should this be a deepcopy of self?

@@ -2165,3 +2165,21 @@ def test_match_to_catalog_3d_and_sky():
     npt.assert_array_equal(idx, [0, 1, 2, 3])
     assert_allclose(angle, 0 * u.deg, atol=1e-14 * u.deg, rtol=0)
     assert_allclose(distance, 0 * u.kpc, atol=1e-14 * u.kpc, rtol=0)
+
+
+def test_property_attribute_error():
+    """Test that accessing a non-existent attribute through a property gives the correct error."""
+    from astropy.coordinates import SkyCoord
+
+    class CustomCoord(SkyCoord):
+        @property
+        def prop(self):
+            return self.random_attr
+
+    c = CustomCoord('00h42m30s', '+41d12m00s', frame='icrs')
+    
+    with pytest.raises(AttributeError) as excinfo:
+        c.prop
+    
+    assert "'CustomCoord' object has no attribute 'random_attr'" in str(excinfo.value)
+    assert "'CustomCoord' object has no attribute 'prop'" not in str(excinfo.value)
